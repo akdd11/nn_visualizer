@@ -71,7 +71,6 @@ def define_num_elements_to_plot(model,
 
   # finding maximum number of filters and neurons in the network
   for l in model.layers:
-    print(l.name)
     if 'dense' in l.name or 'flatten' in l.name:
       num_elements_to_plot[l.name] = l.output_shape[1]
       if l.output_shape[1] > max_neurons:
@@ -160,7 +159,7 @@ def draw_dense_layer(ax, x, y, num_neurons):
 
 
 
-def visualize_model():
+def visualize_model(model):
   plt.rcParams['figure.figsize'] = (12, 4)
 
   fig, ax = plt.subplots()
@@ -227,5 +226,3 @@ def visualize_model():
   plt.ylim([y_min, 2])
   plt.axis('off')
   plt.show()
-
-visualize_model()
