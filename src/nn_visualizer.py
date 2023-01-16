@@ -1,3 +1,9 @@
+# Copyright (c) 2023, Anton Krause
+# All rights reserved.
+
+# This source code is licensed under the GPL-3 license found in the
+# LICENSE file in the root directory of this source tree. 
+
 import matplotlib.pyplot as plt
 import numpy as np
 
