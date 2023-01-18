@@ -1,11 +1,12 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
 [project]
 name = "nnvisualizertf"
-version = "0.3"
-author = ["Anton Krause"]
-description = "Package for visualizing Tensorflow networks"
+authors = [{name = "Anton Krause"}]
 readme = "README.md"
-license = {file = "LICENSE.txt"}
-keywords = ["plotting", "tensorflow", "keras", "matplotlib"]
+dynamic = ["version", "description"]
 
 classifiers =[
     "Programming Language :: Python :: 3",
@@ -17,13 +18,10 @@ classifiers =[
 
 dependencies = [
     "matplotlib",
-    "numpy"
+    "numpy",
+    "tensorflow"
 ]
 
 [project.urls]
 homepage = "https://github.com/akdd11/nn_visualizer"
 changelog = "https://github.com/akdd11/nn_visualizer/blob/main/README.md"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"

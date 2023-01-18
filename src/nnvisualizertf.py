@@ -2,7 +2,11 @@
 # All rights reserved.
 
 # This source code is licensed under the GPL-3 license found in the
-# LICENSE file in the root directory of this source tree. 
+# LICENSE file in the root directory of this source tree.
+
+"""Visualizing Tensorflow networks."""
+
+__version__ = "0.6"
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -81,6 +85,10 @@ def define_num_elements_to_plot(model,
       num_elements_to_plot[l.name] = l.output_shape[1]
       if l.output_shape[1] > max_neurons:
         max_neurons = l.output_shape[1]
+    elif 'input' in l.name and len(l.output_shape[0]) == 2:
+      num_elements_to_plot[l.name] = l.output_shape[0][1]
+      if l.output_shape[0][1] > max_neurons:
+        max_neurons = l.output_shape[0][1]
     elif 'conv2d' in l.name or 'pooling2d' in l.name:
       num_elements_to_plot[l.name] = l.output_shape[3]
       if l.output_shape[3] > max_filters:
@@ -88,11 +96,13 @@ def define_num_elements_to_plot(model,
 
   # adjust numbers of elements to plot relatively to maximum number
   for l_name in num_elements_to_plot:
-    if 'dense' in l_name or 'flatten' in l_name:
-      num_elements_to_plot[l_name] = np.max([num_elements_to_plot[l_name]/max_neurons * max_neurons_to_plot,
-                                             min_neurons_to_plot]).astype(int)
+    if 'dense' in l_name or 'flatten' in l_name or 'input' in l_name:
+      if num_elements_to_plot[l_name] > min_neurons_to_plot:
+        # make sure that not more neurons are plotted than are actually there
+        num_elements_to_plot[l_name] = np.max([num_elements_to_plot[l_name]/max_neurons * max_neurons_to_plot,
+                                              min_neurons_to_plot]).astype(int)
     elif 'conv2d' in l_name or 'pooling2d' in l_name:
-      num_elements_to_plot[l_name] = np.max([num_elements_to_plot[l_name]/max_filters * max_filters_to_plot,
+      num_elements_to_plot[l_name] = np.min([num_elements_to_plot[l_name]/max_filters * max_filters_to_plot,
                                              min_filters_to_plot]).astype(int)
 
   return num_elements_to_plot
@@ -189,11 +199,13 @@ def visualize_model(model):
     if 'input' in l.name:
       add_layer_description(l, x, y)
       if len(l.output_shape[0]) == 2:
-        x, y = draw_dense_layer(ax, x, 0, np.round(l.shape[1]/max_neurons))
+        x_old = x
+        x, y = draw_dense_layer(ax, x, 0, num_elements_to_plot[l.name])
+        operation_labels_xpos[l.name] = x - (x-x_old)/2
       elif len(l.output_shape[0]) == 4:
         x_size = np.round(size*l.output_shape[0][1]/max_conv_size[0])
         y_size = np.round(size*l.output_shape[0][2]/max_conv_size[1])
-        x, y = draw_conv_layer(ax, x, 0,x_size, y_size, l.output_shape[0][3])
+        x, y = draw_conv_layer(ax, x, 0, x_size, y_size, l.output_shape[0][3])
         xy = (x-1-3/4*x_size, y+1+1/8*y_size)
         connections.append(Connection(ax, '2d', xy=xy, width=1/4*x_size, height=1/4*y_size))
         operation_labels_xpos[l.name] = xy[0]
@@ -232,3 +244,18 @@ def visualize_model(model):
   plt.ylim([y_min, 2])
   plt.axis('off')
   plt.show()
+
+
+if __name__ == "__main__":
+  from tensorflow.keras.models import Model
+  from tensorflow.keras.layers import AveragePooling2D, Conv2D, MaxPooling2D
+  from tensorflow.keras.layers import Dense, Dropout, Flatten, Input, concatenate
+
+  in_layer = Input(shape=(16))
+  dense1 = Dense(128)(in_layer)
+  dense2 = Dense(64)(dense1)
+  out = Dense(1)(dense2)
+
+  model = Model(inputs=in_layer, outputs=out)
+
+  visualize_model(model)
