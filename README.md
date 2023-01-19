@@ -3,7 +3,7 @@ Visualizing Tensorflow neural networks.
 
 Please see the *examples.ipynb* notebook for an example on how to use the package.
 
-![example_output1.png](./doc/figures/example_output1.png)
+![example_output1.png](https://raw.githubusercontent.com/akdd11/nn_visualizer/main/doc/figures/example_output1.png)
 
 Currently supporting:
 * Input layers:
@@ -18,6 +18,9 @@ Currently supporting:
   * Flatten
 
 ## Changes
+
+### 0.7
+* Fixed cases, in which the layers descriptions have overlapped.
 
 ### 0.6
 * Supporting dense layers as input.
